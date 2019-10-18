@@ -1,0 +1,6 @@
+# STMCubeMX files
+/.mxproject
+/*.ioc
+
+# Build files
+/build/
