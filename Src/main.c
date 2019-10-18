@@ -56,6 +56,10 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void delay(volatile int i)
+{
+  while (--i);
+}
 
 /* USER CODE END 0 */
 
@@ -110,6 +114,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_13);
+    delay(1000000);
+    LL_GPIO_ResetOutputPin(GPIOC, LL_GPIO_PIN_13);
+    delay(1000000);
   }
   /* USER CODE END 3 */
 }
