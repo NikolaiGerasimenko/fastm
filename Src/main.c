@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "fastm_uart.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -56,10 +57,6 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void delay(volatile int i)
-{
-  while (--i);
-}
 
 /* USER CODE END 0 */
 
@@ -109,15 +106,17 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uart_init(1, 115200);
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    uart_write(1, "["__TIME__"]: UART test!\n\r", 24);
     LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_13);
-    delay(1000000);
+    delay(1);
     LL_GPIO_ResetOutputPin(GPIOC, LL_GPIO_PIN_13);
-    delay(1000000);
+    delay(1);
   }
   /* USER CODE END 3 */
 }
