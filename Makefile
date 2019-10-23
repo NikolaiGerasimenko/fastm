@@ -36,14 +36,9 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-Src/main.c \
-Src/stm32f1xx_it.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_gpio.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_pwr.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_exti.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_rcc.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_utils.c \
-Src/system_stm32f1xx.c  
+$(wildcard Src/*.c) \
+$(wildcard Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_*.c) \
+$(wildcard fastm/src/*.c)   
 
 # ASM sources
 ASM_SOURCES =  \
@@ -122,7 +117,7 @@ C_INCLUDES =  \
 -IDrivers/STM32F1xx_HAL_Driver/Inc \
 -IDrivers/CMSIS/Device/ST/STM32F1xx/Include \
 -IDrivers/CMSIS/Include \
--IDrivers/CMSIS/Include
+-Ifastm/inc
 
 
 # compile gcc flags
