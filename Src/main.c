@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "fastm_uart.h"
+#include "fastm_i2c.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -67,7 +68,7 @@ static void MX_GPIO_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  char buff[10] = {0};
   /* USER CODE END 1 */
   
 
@@ -101,7 +102,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-
+  printf("[%s]: init!\n\r", __TIME__);
+  i2c_init(1);
+  printf("[%s]: write!\n\r", __TIME__);
+  i2c_write(1, 0x50, 0, 2, __TIME__, 8);
+  printf("[%s]: read!\n\r", __TIME__);
+  i2c_read(1, 0x50, 0, 2, buff, 8);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -111,6 +117,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    printf("[%s]: Read data from I2C: %s!\n\r", __TIME__, buff);
     printf("[%s]: UART printf test!\n\r", __TIME__);
     LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_13);
     delay(1);
