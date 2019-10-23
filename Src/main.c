@@ -106,13 +106,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uart_init(1, 115200);
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    uart_write(1, "["__TIME__"]: UART test!\n\r", 24);
+    printf("[%s]: UART printf test!\n\r", __TIME__);
     LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_13);
     delay(1);
     LL_GPIO_ResetOutputPin(GPIOC, LL_GPIO_PIN_13);
