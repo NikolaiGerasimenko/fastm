@@ -34,15 +34,15 @@ int uart_init(uint8_t uart_num, uint32_t speed)
 	if (uart[uart_num].init) return 0;
 
 	uart_gpio_init.Mode = LL_GPIO_MODE_ALTERNATE;
+	uart_gpio_init.Speed = LL_GPIO_SPEED_FREQ_HIGH;
 	uart_gpio_init.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
 	uart_gpio_init.Pull = LL_GPIO_PULL_UP;
-	uart_gpio_init.Speed = LL_GPIO_SPEED_FREQ_HIGH;
 
 	uart_init.DataWidth = LL_USART_DATAWIDTH_8B;
 	uart_init.StopBits = LL_USART_STOPBITS_1;
 	uart_init.Parity = LL_USART_PARITY_NONE;
-	uart_init.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
 	uart_init.TransferDirection = LL_USART_DIRECTION_TX_RX;
+	uart_init.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
 
 	switch (uart_num) {
 	case 1:
