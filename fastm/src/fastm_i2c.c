@@ -44,9 +44,9 @@ int i2c_init(uint8_t i2c_num)
 	if (i2c[i2c_num].init) return 0;
 
 	i2c_gpio_init.Mode = LL_GPIO_MODE_ALTERNATE;
+	i2c_gpio_init.Speed = LL_GPIO_SPEED_FREQ_HIGH;
     i2c_gpio_init.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
 	i2c_gpio_init.Pull = LL_GPIO_PULL_UP;
-	i2c_gpio_init.Speed = LL_GPIO_SPEED_FREQ_HIGH;
 
 	i2c_init.PeripheralMode = LL_I2C_MODE_I2C;
     i2c_init.ClockSpeed = 50000; // 50kHz (max 400)
@@ -75,11 +75,11 @@ int i2c_init(uint8_t i2c_num)
 	i2c_base = i2c_get_base(i2c_num);
 
 	LL_I2C_Init(i2c_base, &i2c_init);
-	LL_I2C_Enable(i2c[i2c_num].base);
+	LL_I2C_Enable(i2c_base);
 
 	// Save config
 	i2c[i2c_num].init = 1;
-	//I2C1 = i2c_base;
+	i2c[i2c_num].base = i2c_base;
 
 	return 0;
 }
