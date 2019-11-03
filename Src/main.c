@@ -19,8 +19,11 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
 #include "main.h"
 #include "fastm_uart.h"
+#include "fastm_i2c.h"
+#include "fastm_spi.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -67,7 +70,8 @@ static void MX_GPIO_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  char buff_i2c[10] = {0};
+  char buff_spi[10] = {0};
   /* USER CODE END 1 */
   
 
@@ -101,18 +105,32 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
+  printf("[%s]: i2c init!\n\r", __TIME__);
+  i2c_init(1);
+  printf("[%s]: i2c write!\n\r", __TIME__);
+  i2c_write(1, 0x50, 0, 2, __TIME__, 8);
+  printf("[%s]: i2c read!\n\r", __TIME__);
+  i2c_read(1, 0x50, 0, 2, buff_i2c, 8);
+
+  printf("[%s]: spi init!\n\r", __TIME__);
+  spi_init(1);
+  printf("[%s]: spi write!\n\r", __TIME__);
+  spi_write(1, __TIME__, 8);
+  printf("[%s]: spi read!\n\r", __TIME__);
+  spi_read(1, buff_spi, 8);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uart_init(1, 115200);
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    uart_write(1, "["__TIME__"]: UART test!\n\r", 24);
+    printf("[%s]: Read data from I2C: %s!\n\r", __TIME__, buff_i2c);
+    printf("[%s]: Read data from SPI: %s!\n\r", __TIME__, buff_spi);
+    printf("[%s]: UART printf test!\n\r", __TIME__);
     LL_GPIO_SetOutputPin(GPIOC, LL_GPIO_PIN_13);
     delay(1);
     LL_GPIO_ResetOutputPin(GPIOC, LL_GPIO_PIN_13);
