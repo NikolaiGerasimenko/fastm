@@ -90,51 +90,68 @@ int i2c_init(uint8_t i2c_num)
 int i2c_read(u8 i2c_num, u8 slave_addr, u32 reg_addr, u8 reg_addr_size, u8 *data, ssize_t len)
 {
 	ssize_t bytes_to_rcv = len;
+	ssize_t addr_size = reg_addr_size;
 	u8 *buf = data;
 
+	printf("EE rd1\n\r");
 	LL_I2C_GenerateStartCondition(i2c[i2c_num].base);
     while (!LL_I2C_IsActiveFlag_SB(i2c[i2c_num].base));
 
+	printf("EE rd2\n\r");
 	LL_I2C_TransmitData8(i2c[i2c_num].base, slave_addr << 1);
     while (!LL_I2C_IsActiveFlag_ADDR(i2c[i2c_num].base));
 
 	// Unstretch the clock
     // TODO: fix i2c1
+	printf("EE rd3\n\r");
 	LL_I2C_ReadReg(I2C1, SR2);
 
-	LL_I2C_TransmitData8(i2c[i2c_num].base, reg_addr);
-    while (!LL_I2C_IsActiveFlag_BTF(i2c[i2c_num].base));
-
-    LL_I2C_TransmitData8(i2c[i2c_num].base, reg_addr >> 8);
-    while (!LL_I2C_IsActiveFlag_BTF(i2c[i2c_num].base));
+	// Send reg addr
+	while (addr_size--) {
+		printf("EE rd4\n\r");
+		LL_I2C_TransmitData8(i2c[i2c_num].base, reg_addr >> (8 * (reg_addr_size - (addr_size + 1))));
+    	while (!LL_I2C_IsActiveFlag_TXE(i2c[i2c_num].base));
+	}
 
 	// Generate Start
+	printf("EE rd5\n\r");
 	LL_I2C_GenerateStartCondition(i2c[i2c_num].base);
     while (!LL_I2C_IsActiveFlag_SB(i2c[i2c_num].base));
 
 	// Send I2C Device Address and clear ADDR
+	printf("EE rd6\n\r");
 	LL_I2C_TransmitData8(i2c[i2c_num].base, (slave_addr << 1) | 1);
     while (!LL_I2C_IsActiveFlag_ADDR(i2c[i2c_num].base));
 
-	// Unstretch the clock
+	// Unstretch the clock (Part of clear ADDR sequence)
     // TODO: fix i2c1
+	printf("EE rd7\n\r");
 	LL_I2C_ReadReg(I2C1, SR2);
 
+	// Reading data except the last byte
 	while ((bytes_to_rcv--) > 1) {
         while (!LL_I2C_IsActiveFlag_RXNE(i2c[i2c_num].base));
 		*buf = LL_I2C_ReceiveData8(i2c[i2c_num].base);
 		buf++;
+		printf("EE rd8\n\r");
+		// TODO: Handle receiving properly. Start sending NACK when received N-3 bytes
 	}
 
+	// Receive the last byte with NACK
+	printf("EE rd9\n\r");
 	LL_I2C_AcknowledgeNextData(i2c[i2c_num].base, LL_I2C_NACK);
-
-	LL_I2C_GenerateStopCondition(i2c[i2c_num].base);
-
-    while (!LL_I2C_IsActiveFlag_RXNE(i2c[i2c_num].base));
+	while (!LL_I2C_IsActiveFlag_RXNE(i2c[i2c_num].base));
 	*buf = LL_I2C_ReceiveData8(i2c[i2c_num].base);
+	
+	// Stop transaction
+	printf("EE rd10\n\r");
+	LL_I2C_GenerateStopCondition(i2c[i2c_num].base);
+	while(LL_I2C_IsActiveFlag_BUSY(i2c[i2c_num].base));
 
-	wait_for_idle(i2c_num);
-	LL_I2C_AcknowledgeNextData(i2c[i2c_num].base, LL_I2C_ACK);
+	// TODO: Don't need this when handling properly.
+	// Clear buffer if sender sent more
+	LL_I2C_ReceiveData8(i2c[i2c_num].base);
+	LL_I2C_ReceiveData8(i2c[i2c_num].base);
 
 	return len;
 }
@@ -145,42 +162,40 @@ int i2c_write(u8 i2c_num, u8 slave_addr, u32 reg_addr, u8 reg_addr_size, const u
 	ssize_t addr_size = reg_addr_size;
 	u8 *buf = (u8 *)data;
 
+	printf("EE wr1\n\r");
 	LL_I2C_GenerateStartCondition(i2c[i2c_num].base);
-    	printf("EE wr1\n\r");
     while (!LL_I2C_IsActiveFlag_SB(i2c[i2c_num].base));
 
+	printf("EE wr2\n\r");
 	LL_I2C_TransmitData8(i2c[i2c_num].base, (slave_addr << 1) | 0);
-    	printf("EE wr2\n\r");
     while (!LL_I2C_IsActiveFlag_ADDR(i2c[i2c_num].base));
 
 	// Unstretch the clock
     // TODO: fix i2c1
+	printf("EE wr3\n\r");
 	LL_I2C_ReadReg(I2C1, SR2);
-    printf("EE wr3\n\r");
 
 	// Send reg addr
 	while (addr_size--) {
 		LL_I2C_TransmitData8(i2c[i2c_num].base, reg_addr >> (8 * (reg_addr_size - (addr_size + 1))));
         while (!LL_I2C_IsActiveFlag_TXE(i2c[i2c_num].base));
+		printf("EE wr4\n\r");
 	}
-	printf("EE wr4\n\r");
-    while (!LL_I2C_IsActiveFlag_BTF(I2C1));
-
+	
 	// Writing Data
-    printf("EE wr5\n\r");
 	while (bytes_to_send--) {
+		printf("EE wr5\n\r");
 		LL_I2C_TransmitData8(i2c[i2c_num].base, *buf++);
         while (!LL_I2C_IsActiveFlag_TXE(i2c[i2c_num].base));
 	}
-    printf("EE wr6\n\r");
 
 	// Wait for the data to be transmitted
+	printf("EE wr6\n\r");
     while (!LL_I2C_IsActiveFlag_BTF(i2c[i2c_num].base));
-    printf("EE wr7\n\r");
-
+    
+	printf("EE wr7\n\r");
 	LL_I2C_GenerateStopCondition(i2c[i2c_num].base);
-	wait_for_idle(i2c_num);
-    printf("EE wr8\n\r");
+	while(LL_I2C_IsActiveFlag_BUSY(i2c[i2c_num].base));
 
 	return len;
 }

@@ -29,8 +29,10 @@ int main(void)
   i2c_init(1);
   printf("[%s]: i2c write!\n\r", __TIME__);
   i2c_write(1, 0x50, 0, 2, (u8 *)__TIME__, 8);
+  mdelay(20); // Write cycle delay. For EEPROMS and other memory.
   printf("[%s]: i2c read!\n\r", __TIME__);
   i2c_read(1, 0x50, 0, 2, buff_i2c, 8);
+  printf("[%s]: Read data from I2C: %s\n\r", __TIME__, buff_i2c);
 
   // SPI init/test
   printf("[%s]: spi init!\n\r", __TIME__);
@@ -39,11 +41,9 @@ int main(void)
   spi_write(1, (u8 *)__TIME__, 8);
   printf("[%s]: spi read!\n\r", __TIME__);
   spi_read(1, buff_spi, 8);
+  printf("[%s]: Read data from SPI: %s\n\r", __TIME__, buff_spi);
 
-  while (1)
-  {
-    printf("[%s]: Read data from I2C: %s!\n\r", __TIME__, buff_i2c);
-    printf("[%s]: Read data from SPI: %s!\n\r", __TIME__, buff_spi);
+  while (1) {
     printf("[%s]: UART printf test!\n\r", __TIME__);
 
     // GPIO toggle
