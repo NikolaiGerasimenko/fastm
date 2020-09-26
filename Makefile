@@ -13,7 +13,7 @@
 ######################################
 # target
 ######################################
-TARGET = fastm
+TARGET = $(shell echo $(realpath .) | sed "s|$(realpath ..)/||g")
 
 
 ######################################
@@ -36,13 +36,14 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-$(wildcard Src/*.c) \
 $(wildcard Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_*.c) \
-$(wildcard fastm/src/*.c)   
+$(wildcard sys/src/*.c) \
+$(wildcard fastm/src/*.c) \
+$(wildcard src/*.c)
 
 # ASM sources
 ASM_SOURCES =  \
-startup_stm32f103xb.s
+sys/src/startup_stm32f103xb.s
 
 
 #######################################
@@ -113,11 +114,12 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
--IInc \
 -IDrivers/STM32F1xx_HAL_Driver/Inc \
 -IDrivers/CMSIS/Device/ST/STM32F1xx/Include \
 -IDrivers/CMSIS/Include \
--Ifastm/inc
+-Isys/inc \
+-Ifastm/inc \
+-Iinc
 
 
 # compile gcc flags
@@ -138,7 +140,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 # LDFLAGS
 #######################################
 # link script
-LDSCRIPT = STM32F103C8Tx_FLASH.ld
+LDSCRIPT = sys/STM32F103C8Tx_FLASH.ld
 
 # libraries
 LIBS = -lc -lm -lnosys 

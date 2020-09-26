@@ -4,6 +4,9 @@
 #include "stm32f1xx_ll_gpio.h"
 #include "stm32f1xx_ll_i2c.h"
 
+// TODO: remove
+#include <stdio.h>
+
 struct i2c_config {
 	uint8_t init;
 	void *base;
