@@ -176,11 +176,11 @@ int i2c_write(u8 i2c_num, u8 slave_addr, u32 reg_addr, u8 reg_addr_size, const u
 	LL_I2C_ReadReg(I2C1, SR2);
 
 	// Send reg addr
-	while (addr_size--) {
-		LL_I2C_TransmitData8(i2c[i2c_num].base, reg_addr >> (8 * (reg_addr_size - (addr_size + 1))));
-        while (!LL_I2C_IsActiveFlag_TXE(i2c[i2c_num].base));
-		printf("EE wr4\n\r");
-	}
+	// while (addr_size--) {
+	// 	LL_I2C_TransmitData8(i2c[i2c_num].base, reg_addr >> (8 * (reg_addr_size - (addr_size + 1))));
+    //     while (!LL_I2C_IsActiveFlag_TXE(i2c[i2c_num].base));
+	// 	printf("EE wr4\n\r");
+	// }
 	
 	// Writing Data
 	while (bytes_to_send--) {
